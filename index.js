@@ -1,19 +1,18 @@
 import express from "express";
-import { tmpdir } from "os";
 import path from "path";
+import { tmpdir } from "os";
 import { unlink } from "fs";
-import ytdlp from "yt-dlp-exec";
+import youtubedl from "youtube-dl-exec";
 
 const app = express();
 const PORT = process.env.PORT || 10000;
 
 // Health-check route
 app.get("/", (req, res) => {
-  res.status(200).send("✅ YouTube Download API is live and healthy!");
+  res.send("✅ YouTube Download API is live!");
 });
 
 // Download route
-// Usage: /download?url=<YouTube_URL>&type=<mp4|mp3>
 app.get("/download", async (req, res) => {
   const videoUrl = req.query.url;
   const type = (req.query.type || "mp4").toLowerCase();
@@ -24,22 +23,21 @@ app.get("/download", async (req, res) => {
 
   try {
     if (type === "mp3") {
-      await ytdlp(videoUrl, {
+      await youtubedl(videoUrl, {
         output: tempFile,
         extractAudio: true,
         audioFormat: "mp3",
         quiet: true
       });
     } else {
-      await ytdlp(videoUrl, {
+      await youtubedl(videoUrl, {
         output: tempFile,
-        format: "best[ext=mp4]/best",
+        format: "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best",
         quiet: true
       });
     }
 
     res.download(tempFile, `${type === "mp3" ? "audio" : "video"}.${type}`, err => {
-      // Clean up temp file
       unlink(tempFile, () => {});
     });
   } catch (err) {
