@@ -1,14 +1,18 @@
 {
   "name": "youtube-download-api",
-  "version": "2.0.0",
+  "version": "2.3.0",
+  "description": "YouTube Download API for MP4/MP3 using yt-dlp-exec, Render-compatible.",
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "prestart": "npm install yt-dlp-exec@latest",
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "node-fetch": "^3.3.2",
-    "yt-dlp-exec": "^2.5.0"
+    "yt-dlp-exec": "^1.0.7"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
