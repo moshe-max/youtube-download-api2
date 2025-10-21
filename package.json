@@ -1,18 +1,15 @@
 {
   "name": "youtube-download-api",
-  "version": "2.0.0",
-  "description": "A simple Express-based API for downloading YouTube videos using ytdl-core, compatible with Render.com.",
-  "main": "index.js",
+  "version": "2.0.1",
   "type": "module",
   "scripts": {
     "prestart": "npm install ytdl-core@latest",
     "start": "node index.js"
   },
+  "dependencies": {
+    "express": "^4.21.1"
+  },
   "engines": {
     "node": ">=18"
-  },
-  "dependencies": {
-    "express": "^4.21.1",
-    "ytdl-core": "^4.11.7"
   }
 }
