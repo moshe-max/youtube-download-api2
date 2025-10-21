@@ -1,26 +1,22 @@
 {
-    "name": "youtube-download-api",
-    "description": "",
-    "version": "1.0.0",
-    "main": "index.js",
-    "scripts": {
-        "start": "node index.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/MatheusIshiyama/youtube-download-api.git"
-    },
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/MatheusIshiyama/youtube-download-api/issues"
-    },
-    "homepage": "https://github.com/MatheusIshiyama/youtube-download-api#readme",
-    "dependencies": {
-        "cors": "^2.8.5",
-        "express": "^4.17.1",
-        "ytdl-core": "^4.5.0"
-    },
-    "devDependencies": {}
+  "name": "youtube-download-api",
+  "version": "2.0.0",
+  "description": "Internal training-safe YouTube Download API with auto-update and safeguards.",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install ytdl-core@latest", 
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.0",
+    "ytdl-core": "^4.11.0",
+    "basic-auth": "^2.0.1",
+    "morgan": "^1.10.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
 }
