@@ -1,6 +1,8 @@
 {
   "name": "youtube-download-api",
-  "version": "2.0.1",
+  "version": "2.1.0",
+  "description": "Express-based YouTube download API supporting MP4 and MP3 output, optimized for Render.com deployment.",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "prestart": "npm install ytdl-core@latest",
