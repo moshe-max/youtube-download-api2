@@ -1,17 +1,15 @@
 import express from "express";
-import ytdl from "ytdl-core";
+import ytdl from "@distube/ytdl-core";  // <- Updated import
 import { exec } from "child_process";
 
 const app = express();
 
-// ========== Render Health Check ==========
+// Health check
 app.get("/", (req, res) => {
-  res.status(200).send("✅ YouTube Download API is live and healthy!");
+  res.status(200).send("✅ YouTube Download API is live and healthy (DisTube core)!");
 });
 
-// ========== Main Download Route ==========
-// Example:
-// /download?url=https://youtube.com/watch?v=...&type=mp3
+// Download route
 app.get("/download", async (req, res) => {
   const url = req.query.url;
   const type = (req.query.type || "mp4").toLowerCase();
@@ -25,32 +23,24 @@ app.get("/download", async (req, res) => {
     const title = info.videoDetails.title.replace(/[^\w\s]/gi, "_");
 
     if (type === "mp3" || type === "audio") {
-      // Audio-only stream
       res.header("Content-Disposition", `attachment; filename="${title}.mp3"`);
       ytdl(url, { filter: "audioonly", quality: "highestaudio" }).pipe(res);
     } else {
-      // Full video
       res.header("Content-Disposition", `attachment; filename="${title}.mp4"`);
       ytdl(url, { quality: "highestvideo", format: "mp4" }).pipe(res);
     }
   } catch (error) {
     console.error("⚠️ Download error:", error.message);
-    res
-      .status(500)
-      .send("❌ Failed to process video. YouTube may have updated its encryption.");
+    res.status(500).send("❌ Failed to process video. Please try again later.");
   }
 });
 
-// ========== Auto-update ytdl-core ==========
-exec("npm install ytdl-core@latest", (err, stdout, stderr) => {
-  if (err) {
-    console.error("⚠️ Auto-update failed:", stderr);
-  } else {
-    console.log("🔄 ytdl-core auto-updated successfully.");
-  }
+// Auto-update fallback
+exec("npm install @distube/ytdl-core@latest", (err, stdout, stderr) => {
+  if (err) console.error("⚠️ Auto-update failed:", stderr);
+  else console.log("🔄 @distube/ytdl-core auto-updated successfully.");
 });
 
-// ========== Start Server ==========
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
