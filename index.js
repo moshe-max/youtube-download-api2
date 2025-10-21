@@ -1,93 +1,47 @@
-const express = require('express');
-const cors = require('cors');
-const ytdl = require('ytdl-core');
-const basicAuth = require('basic-auth');
-const rateLimit = require('express-rate-limit');
-const morgan = require('morgan');
-const { exec } = require('child_process');
+import express from "express";
+import ytdl from "ytdl-core";
 
 const app = express();
-app.use(cors());
-app.use(morgan('dev'));
 
-// === Basic Authentication Middleware ===
-const AUTH_USER = process.env.API_USER || 'trainer';
-const AUTH_PASS = process.env.API_PASS || 'secret';
+// === Health Check Route ===
+app.get("/", (req, res) => {
+  res.status(200).send("✅ YouTube Download API is live and healthy!");
+});
 
-app.use((req, res, next) => {
-  const user = basicAuth(req);
-  if (!user || user.name !== AUTH_USER || user.pass !== AUTH_PASS) {
-    res.set('WWW-Authenticate', 'Basic realm="Training Access"');
-    return res.status(401).send('Access denied.');
+// === Download Route ===
+app.get("/download", async (req, res) => {
+  const url = req.query.url;
+  if (!url) {
+    return res.status(400).send("❌ Missing 'url' query parameter.");
   }
-  next();
-});
 
-// === Rate Limiting ===
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 15, // 15 requests per 15 minutes per IP
-  message: { error: 'Rate limit exceeded, please wait before retrying.' }
-});
-app.use(limiter);
-
-// === Auto-update ytdl-core (failsafe) ===
-exec('npm install ytdl-core@latest', (err, stdout, stderr) => {
-  if (err) console.error('ytdl-core update error:', stderr);
-  else console.log('ytdl-core auto-updated:', stdout);
-});
-
-// === Endpoints ===
-
-// Get basic video info
-app.get('/info', async (req, res) => {
-  const videoUrl = req.query.url;
-  if (!videoUrl) return res.status(400).send('Missing ?url=');
   try {
-    const info = await ytdl.getInfo(videoUrl);
-    const details = info.videoDetails;
-    res.json({
-      title: details.title,
-      author: details.author.name,
-      duration: `${Math.floor(details.lengthSeconds / 60)}:${details.lengthSeconds % 60}`,
-      thumbnail: details.thumbnails.pop().url
-    });
-  } catch (err) {
-    console.error('Info error:', err.message);
-    res.status(500).json({ error: err.message });
+    const info = await ytdl.getInfo(url);
+    const title = info.videoDetails.title.replace(/[^\w\s]/gi, "_");
+    res.header("Content-Disposition", `attachment; filename="${title}.mp4"`);
+
+    ytdl(url, {
+      format: "mp4",
+      quality: "highestvideo",
+    }).pipe(res);
+  } catch (error) {
+    console.error("⚠️ Error downloading video:", error.message);
+    res.status(500).send("❌ Failed to process video. Possibly YouTube updated their encryption.");
   }
 });
 
-// Download MP3
-app.get('/mp3', (req, res) => {
-  const videoUrl = req.query.url;
-  if (!videoUrl) return res.status(400).send('Missing ?url=');
-  try {
-    res.header('Content-Disposition', 'attachment; filename=audio.mp3');
-    ytdl(videoUrl, { filter: 'audioonly', quality: 'highestaudio' }).pipe(res);
-  } catch (err) {
-    console.error('MP3 error:', err.message);
-    res.status(500).json({ error: 'Download failed' });
+// === Auto-update logic for ytdl-core (Render-friendly) ===
+import { exec } from "child_process";
+exec("npm install ytdl-core@latest", (err, stdout, stderr) => {
+  if (err) {
+    console.error("⚠️ Auto-update failed:", stderr);
+  } else {
+    console.log("🔄 ytdl-core auto-updated successfully.");
   }
 });
 
-// Download MP4
-app.get('/mp4', (req, res) => {
-  const videoUrl = req.query.url;
-  if (!videoUrl) return res.status(400).send('Missing ?url=');
-  try {
-    res.header('Content-Disposition', 'attachment; filename=video.mp4');
-    ytdl(videoUrl, { filter: 'videoandaudio', quality: 'highest' }).pipe(res);
-  } catch (err) {
-    console.error('MP4 error:', err.message);
-    res.status(500).json({ error: 'Download failed' });
-  }
+// === Start Server (Render expects process.env.PORT) ===
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
-
-// Root route
-app.get('/', (req, res) => {
-  res.send('🎓 YouTube Download API for Training Use Only - Authenticated Access');
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server live on port ${PORT}`));
