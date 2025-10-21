@@ -1,22 +1,18 @@
 {
   "name": "youtube-download-api",
   "version": "2.0.0",
-  "description": "Internal training-safe YouTube Download API with auto-update and safeguards.",
+  "description": "A simple Express-based API for downloading YouTube videos using ytdl-core, compatible with Render.com.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "prestart": "npm install ytdl-core@latest", 
+    "prestart": "npm install ytdl-core@latest",
     "start": "node index.js"
   },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "express-rate-limit": "^7.1.0",
-    "ytdl-core": "^4.11.0",
-    "basic-auth": "^2.0.1",
-    "morgan": "^1.10.0"
-  },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18"
   },
-  "license": "MIT"
+  "dependencies": {
+    "express": "^4.21.1",
+    "ytdl-core": "^4.11.7"
+  }
 }
