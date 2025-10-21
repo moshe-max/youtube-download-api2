@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: youtube-download-api-training
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: "npm install && npm install ytdl-core@latest"
+    startCommand: "npm start"
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_USER
+        value: trainer
+      - key: API_PASS
+        value: secret
