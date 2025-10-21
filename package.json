@@ -1,18 +1,14 @@
 {
   "name": "youtube-download-api",
-  "version": "2.2.0",
-  "description": "Express-based YouTube download API with MP3 and MP4 support, using @distube/ytdl-core for encryption resilience.",
+  "version": "2.0.0",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "prestart": "npm install @distube/ytdl-core@latest",
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.21.1",
-    "@distube/ytdl-core": "*"
-  },
-  "engines": {
-    "node": ">=18"
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2",
+    "yt-dlp-exec": "^2.5.0"
   }
 }
